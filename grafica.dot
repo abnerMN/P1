@@ -1,0 +1,50 @@
+digraph matrix {
+    graph [label="Matrix of 4 by 4\n azul = organismo1 ", labelloc=t];
+    node [shape=box, width=0.1, height=0.1, fontsize=15, fontname="Arial"];
+    rankdir=TB;
+        nodesep=0.01;
+        ranksep=0.01;
+        
+
+        edge [style=invis len=0];
+    
+        {rank=same; XY; Y1; Y2; Y3;}
+        {rank=same; X1; X1Y1; X1Y2; X1Y3;}
+        {rank=same; X2; X2Y1; X2Y2; X2Y3;}
+        {rank=same; X3; X3Y1; X3Y2; X3Y3;}
+    
+        XY -> X1 -> X2 -> X3;
+        Y1 -> X1Y1 -> X2Y1 -> X3Y1;
+        Y2 -> X1Y2 -> X2Y2 -> X3Y2;
+        Y3 -> X1Y3 -> X2Y3 -> X3Y3;
+
+        
+    
+        //identificando filas y columnas 
+        XY [label="XY"];
+        Y1 [label="1"];
+        Y2 [label="2"];
+        Y3 [label="3"];
+        X1 [label="  1 "];
+        X2 [label="  2 "];
+        X3 [label="  3 "];
+
+        // contenido 
+
+        X1Y1 [label="  " color=blue, style= filled ];
+        X1Y2 [label="  "];
+        X1Y3 [label="  " color=blue, style= filled] ;
+    
+        X2Y1 [label="  "];
+        X2Y2 [label="  "];
+        X2Y3 [label="  "];
+    
+        X3Y1 [label="  "];
+        X3Y2 [label="  "];
+        X3Y3 [label="  "];
+    
+}
+
+
+
+
