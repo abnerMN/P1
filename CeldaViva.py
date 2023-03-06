@@ -5,5 +5,14 @@ class CeldaViva:
         self.y=y
         self.codigoOrganismo=codigoOrganismo
     
+    def getX(self):
+        return self.x
+    
+    def getY(self):
+        return self.y
+    
+    def getCodigo (self):
+        return self.codigoOrganismo
+    
     def imprimir(self):
         print("\ncelda viva:-----", "\nx: ", self.x, "\ny: ", self.y, "\ncodigo: ",self.codigoOrganismo )

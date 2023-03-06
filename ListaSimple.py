@@ -33,14 +33,14 @@ class ListaSimple:
 
 
 #prueba lista
-nuevo = Organismo("scp096", "metamorfo")
-nuevo1 = Organismo("sct056", "reptiliano")
-nuevo2 = CeldaViva(12,12,"SCP986")
-nuevo3 = CeldaViva(2,3,"SCP999")
+#nuevo = Organismo("scp096", "metamorfo")
+#nuevo1 = Organismo("sct056", "reptiliano")
+#nuevo2 = CeldaViva(12,12,"SCP986")
+#nuevo3 = CeldaViva(2,3,"SCP999")
 
-list= ListaSimple()
-list.append(nuevo)
-list.append(nuevo1)
-list.append(nuevo2)
-list.append(nuevo3)
-list.imprimir()
+#list= ListaSimple()
+#list.append(nuevo)
+#list.append(nuevo1)
+#list.append(nuevo2)
+#list.append(nuevo3)
+#list.imprimir()
