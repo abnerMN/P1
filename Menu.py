@@ -28,10 +28,11 @@ class Menu:
         print(
                     '''
         ------------- MENU --------------
-        |       1. Cargar Archivo       |
-        |       2. Gestionar            |
-        |       3. graficar             |
-        |       4. salir                |
+        |  1. Cargar Nuevo Archivo      |
+        |  2. Ver informacion cargada   |
+        |  3. Graficar                  |
+        |  4. Ingresar nueva celda      |
+        |  5. Salir                     |
         ---------------------------------
                     '''
                 )
@@ -43,19 +44,22 @@ class Menu:
             try:
                 sl = int(input('Seleccione una opcion: \n'))
                 if sl == 1:
-                    nombre_archivo= filedialog.askopenfilename()
-                    print(nombre_archivo)  
+                    nombre_archivo= filedialog.askopenfilename() 
                     self.leer_archivo(nombre_archivo)
+                    print('*** archivos cargados exitosamente ***')
                     self.pausa_informacion()
-
+                    self.limpiar__consola()
                 elif sl ==2:
-                    print ('*** ingrese la posicion x para la nueva celula ***')
-                    print ('*** ingrese la posicion y para la nueva celula ***')
+                    self.imprimir_infoActual()
                     self.pausa_informacion()
                 elif sl == 3:
                     self.graficar()
+                    os.startfile("grafica.png")
                     self.pausa_informacion()
                 elif sl == 4:
+                    self.nueva_celula()
+                    self.pausa_informacion()
+                elif sl ==5:
                     print('bye')
                     break
                 else:
@@ -84,7 +88,7 @@ class Menu:
                 if cont_organismo<=1000:
                     letra=self.obtener_letra_aleatoria()
                     color=self.asignar_color()
-                    a=Organismo(codigo,nombre,letra,color)
+                    a=Organismo(codigo,nombre,letra,color,cont_organismo)
                     self.muestra.listaOrganismos.append(a)
                     cont_organismo+=1
 
@@ -118,12 +122,81 @@ class Menu:
 
                 else:
                     print('*** La muestra: ',codigo_muestra,' no se puede agregar por que las filas exceden los 10,000 ***')
-            
-        self.muestra.imprimir()
-        tmp_org=self.muestra.getListaOrganismos()
-        tmp_org.imprimir()
-        tmp_cv= self.muestra.getListaCeldasVivas()
-        tmp_cv.imprimir()
+
+    def nueva_celula(self):
+        while(True):
+            if self.muestra != None:
+                print('*** Ingrese numero de organismo a ingresar ***\n')
+                nodo_actual = self.muestra.getListaOrganismos().cabeza
+                print('0 .- Salir')
+                while nodo_actual != None:
+                    tcodigo=nodo_actual.valor.getCodigo()
+                    tnombre=nodo_actual.valor.getNombre()
+                    tid=nodo_actual.valor.getId()
+                    print(tid,'.-',tcodigo, ' - ', tnombre)
+                    nodo_actual = nodo_actual.nodo_siguiente
+                try:
+                    sl=int(input())
+                    if sl !=0:
+                        try:
+                            posicion_x=int(input('Ingrese coordenada en X:\n'))
+                            posicion_y=int(input('Ingrese coordenada en Y:\n'))
+                            if (posicion_x <= self.muestra.getX()) and (posicion_y<= self.muestra.getY()):
+                                tOrganismo=None
+                                nodo_actual = self.muestra.getListaOrganismos().cabeza
+                                while nodo_actual != None:
+                                    if sl == nodo_actual.valor.getId():
+                                        tOrganismo=nodo_actual.valor
+                                        break
+                                    nodo_actual = nodo_actual.nodo_siguiente
+                                tOrganismo.imprimir()
+                                ttcodigo=tOrganismo.getCodigo()
+                                bandera=False
+                                nodo_actual = self.muestra.getListaCeldasVivas().cabeza
+                                while nodo_actual != None:
+                                    if (posicion_x == int(nodo_actual.valor.getX())) and (posicion_y==int(nodo_actual.valor.getY())):
+                                        bandera=True
+                                    else:pass
+                                    nodo_actual = nodo_actual.nodo_siguiente
+                                    break
+                                if bandera ==False:
+                                    self.muestra.listaCeldasVivas.append(CeldaViva(posicion_x,posicion_y,ttcodigo))
+                                    self.graficar()
+                                    os.startfile("grafica.png")
+                                    print('*** se agrego la muestra ***')
+                                else:
+                                    print('*** no se puede agregar por que esta corrdenada ya esta ocupada ***')
+                                break
+                            else:
+                                print('*** coordenadas X o Y fuera de rango ***')
+                                self.pausa_informacion()
+                                self.limpiar__consola()
+                        except:
+                            print('*** coordenadas no validas')
+                            self.pausa_informacion()
+                            self.limpiar__consola()
+                    else:
+                        break
+                except:
+                    print('*** entrada no valida ****')
+                    self.pausa_informacion()
+                    self.limpiar__consola()
+
+
+            else:
+                print('*** No hay datos almacenados ***')
+                break
+
+#------------------ imprimir informacion almacenada ----------------------------
+    def imprimir_infoActual(self):
+        if self.muestra!= None:
+            self.muestra.imprimir()
+            tmp_org=self.muestra.getListaOrganismos()
+            tmp_org.imprimir()
+            tmp_cv= self.muestra.getListaCeldasVivas()
+            tmp_cv.imprimir()
+        else:
+            print('*** No hay datos almacenados ***')
 
     #---------------------------- grafica-------------------------------------------   
 
@@ -269,7 +342,5 @@ digraph structs {
             tcolor=self.obtenerColor(tcodigo)
             if j==tempX and i==tempY:
                 txt+='''<TD bgcolor="'''+tcolor+'''"></TD>\n'''
-            else:
-                pass
-             
+            else:pass
             nodo_actual = nodo_actual.nodo_siguiente

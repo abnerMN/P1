@@ -11,7 +11,7 @@ class CeldaViva:
     def getY(self):
         return self.y
     
-    def getCodigo (self):
+    def getCodigo(self):
         return self.codigoOrganismo
     
     def imprimir(self):

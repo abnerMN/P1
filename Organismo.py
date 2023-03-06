@@ -1,10 +1,14 @@
 #clase para los objetos Organismo
 class Organismo:
-    def __init__(self, codigo:str, nombre:str, letra:str, color:str):
+    def __init__(self, codigo:str, nombre:str, letra:str, color:str,id:int):
         self.codigo = codigo
         self.nombre = nombre
         self.letra =letra
         self.color = color
+        self.id=id
+    
+    def getId(self):
+        return self.id
     
     def getColor(self):
         return self.color
