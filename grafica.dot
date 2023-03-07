@@ -1,3 +1,4 @@
+#plantilla que se utilizó para hacer el grafo
 digraph structs {
 	    label="Título de la Gráfica";
     	labelloc="top";

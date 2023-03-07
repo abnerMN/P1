@@ -32,7 +32,8 @@ class Menu:
         |  2. Ver informacion cargada   |
         |  3. Graficar                  |
         |  4. Ingresar nueva celda      |
-        |  5. Salir                     |
+        |  5. Escribir XML              |
+        |  6. Salir                     |
         ---------------------------------
                     '''
                 )
@@ -59,7 +60,11 @@ class Menu:
                 elif sl == 4:
                     self.nueva_celula()
                     self.pausa_informacion()
-                elif sl ==5:
+                elif sl==5:
+                    self.escritura_XML()
+                    self.pausa_informacion()
+                    pass
+                elif sl ==6:
                     print('bye')
                     break
                 else:
@@ -123,10 +128,11 @@ class Menu:
                 else:
                     print('*** La muestra: ',codigo_muestra,' no se puede agregar por que las filas exceden los 10,000 ***')
 
+#--------------------------------------- agregar un nuevo elemento a la muestra --------------------
     def nueva_celula(self):
         while(True):
             if self.muestra != None:
-                print('*** Ingrese numero de organismo a ingresar ***\n')
+                print('------------- Organismos ------------')
                 nodo_actual = self.muestra.getListaOrganismos().cabeza
                 print('0 .- Salir')
                 while nodo_actual != None:
@@ -136,45 +142,52 @@ class Menu:
                     print(tid,'.-',tcodigo, ' - ', tnombre)
                     nodo_actual = nodo_actual.nodo_siguiente
                 try:
-                    sl=int(input())
+                    sl=int(input('*** Ingrese numero de organismo a ingresar ***\n'))
                     if sl !=0:
-                        try:
-                            posicion_x=int(input('Ingrese coordenada en X:\n'))
-                            posicion_y=int(input('Ingrese coordenada en Y:\n'))
-                            if (posicion_x <= self.muestra.getX()) and (posicion_y<= self.muestra.getY()):
-                                tOrganismo=None
-                                nodo_actual = self.muestra.getListaOrganismos().cabeza
-                                while nodo_actual != None:
-                                    if sl == nodo_actual.valor.getId():
-                                        tOrganismo=nodo_actual.valor
+                        if sl>0 and sl <=int(self.muestra.listaOrganismos.tamaño):
+                            try:
+                                posicion_x=int(input('Ingrese coordenada en X:\n'))
+                                posicion_y=int(input('Ingrese coordenada en Y:\n'))
+                                if (posicion_x <= self.muestra.getX()) and (posicion_y<= self.muestra.getY()):
+                                    tOrganismo=None
+                                    nodo_actual = self.muestra.getListaOrganismos().cabeza
+                                    while nodo_actual != None:
+                                        if sl == nodo_actual.valor.getId():
+                                            tOrganismo=nodo_actual.valor
+                                            break
+                                        nodo_actual = nodo_actual.nodo_siguiente
+                                    #tOrganismo.imprimir()
+                                    ttcodigo=tOrganismo.getCodigo()
+                                    bandera=False
+                                    nodo_actual = self.muestra.getListaCeldasVivas().cabeza
+                                    while nodo_actual != None:
+                                        if (posicion_x == int(nodo_actual.valor.getX())) and (posicion_y==int(nodo_actual.valor.getY())):
+                                            bandera=True
+                                        else:pass
+                                        nodo_actual = nodo_actual.nodo_siguiente
                                         break
-                                    nodo_actual = nodo_actual.nodo_siguiente
-                                tOrganismo.imprimir()
-                                ttcodigo=tOrganismo.getCodigo()
-                                bandera=False
-                                nodo_actual = self.muestra.getListaCeldasVivas().cabeza
-                                while nodo_actual != None:
-                                    if (posicion_x == int(nodo_actual.valor.getX())) and (posicion_y==int(nodo_actual.valor.getY())):
-                                        bandera=True
-                                    else:pass
-                                    nodo_actual = nodo_actual.nodo_siguiente
+                                    if bandera ==False:
+                                        newCelda=CeldaViva(posicion_x,posicion_y,ttcodigo)
+                                        self.muestra.listaCeldasVivas.append(newCelda)
+                                        self.graficar()
+                                        os.startfile("grafica.png")
+                                        print('*** se agrego la muestra ***')
+                                        newCelda.imprimir()
+                                        #self.analisis(newCelda)
+                                        
+                                    else:
+                                        print('*** no se puede agregar por que esta corrdenada ya esta ocupada ***')
                                     break
-                                if bandera ==False:
-                                    self.muestra.listaCeldasVivas.append(CeldaViva(posicion_x,posicion_y,ttcodigo))
-                                    self.graficar()
-                                    os.startfile("grafica.png")
-                                    print('*** se agrego la muestra ***')
                                 else:
-                                    print('*** no se puede agregar por que esta corrdenada ya esta ocupada ***')
-                                break
-                            else:
-                                print('*** coordenadas X o Y fuera de rango ***')
+                                    print('*** coordenadas X o Y fuera de rango ***')
+                                    self.pausa_informacion()
+                                    self.limpiar__consola()
+                            except:
+                                print('*** coordenadas no validas')
                                 self.pausa_informacion()
                                 self.limpiar__consola()
-                        except:
-                            print('*** coordenadas no validas')
-                            self.pausa_informacion()
-                            self.limpiar__consola()
+                        else:
+                            print('*** opcion invalida ***') 
                     else:
                         break
                 except:
@@ -216,7 +229,7 @@ digraph structs {
             columnas=self.muestra.getY()
 
             #titulo fila
-            cont_y=1
+            cont_y=0
             txt+='''
 <TD>X/Y</TD> 
             '''
@@ -231,9 +244,9 @@ digraph structs {
 </TR>'''
 
             #titulo columna
-            cont_x=1
+            cont_x=0
             for j in range (1,filas+1):
-                cont_y=1
+                cont_y=0
                 txt+='''
 <TR>
 <TD >'''+str(cont_x)+'''</TD>'''
@@ -248,7 +261,7 @@ digraph structs {
                             tempX=int(nodo_actual.valor.getX())
                             tempY=int(nodo_actual.valor.getY())
                             tcolor=self.obtenerColor(tcodigo)
-                            if  tempX==j and tempY==i:                                
+                            if  tempX==j-1 and tempY==i-1:                                
                                 txt+='''<TD bgcolor="'''+tcolor+'''">'''+tcodigo+'''</TD>\n'''
                                 a=i
                                 a+=1
@@ -295,7 +308,108 @@ digraph structs {
         else:
             print('----- No se puede graficar, No hay elementos registrados Err: graficar-----')
 
-    
+    #------------------------- Analisis ---------------------------------------
+
+    def analisis(self,newCelda:CeldaViva):
+        #funcion en donde se tiene que valida si una celula vive o muere 
+        #no esta resuelto :'v
+
+        nx= newCelda.getX()
+        ny= newCelda.getY()
+        ncodigo= newCelda.getCodigo()
+
+        nodo_actual = self.muestra.getListaCeldasVivas().cabeza
+        while nodo_actual != None:
+            tcodigo=nodo_actual.valor.getCodigo()
+            tempX=int(nodo_actual.valor.getX())
+            tempY=int(nodo_actual.valor.getY())
+            tcolor=self.obtenerColor(tcodigo)
+
+            
+
+            if ncodigo != tcodigo:
+                if nx ==tempX and ny !=tempY:
+                    nodo_actual.valor.imprimir()
+                    print('entra en X')
+                if ny ==tempY and nx!= tempX:
+                    nodo_actual.valor.imprimir()
+                    print('entra en Y')
+                    if nx>tempX:
+                        print('mayor')
+                    else:
+                        print('menor')
+            else:
+                pass
+        
+
+            nodo_actual = nodo_actual.nodo_siguiente
+
+    #--------------------------- escritura XML ---------------------------------
+    def escritura_XML(self):
+        if self.muestra!=None:
+            try:
+                arch_xml = open("datos.xml","w")
+                txt='''
+<?xml version="1.0"?>
+    <datosMarte>
+        <listaOrganismos>'''
+                
+                
+                nodo_actual = self.muestra.getListaOrganismos().cabeza
+                while nodo_actual != None:
+                    tcodigo=nodo_actual.valor.getCodigo()
+                    tnombre=nodo_actual.valor.getNombre()
+                    txt+='''
+            <organismo>
+                <codigo>'''+tcodigo+'''</codigo>
+                <nombre>'''+tnombre+'''</nombre>
+            </organismo>'''
+                    nodo_actual = nodo_actual.nodo_siguiente
+
+                txt+='''
+        </listaOrganismos>
+        <listadoMuestras>
+            <muestra>'''
+
+                txt+='''
+                <codigo>'''+self.muestra.getCodigo()+'''</codigo>
+                <descripcion>'''+self.muestra.getDescripcion()+'''</descripcion>
+                <filas>'''+str(self.muestra.getX())+'''</filas>
+                <columnas>'''+str(self.muestra.getY())+'''</columnas>
+        <listadoCeldasVivas>'''
+                
+                nodo_actual = self.muestra.getListaCeldasVivas().cabeza
+                while nodo_actual != None:
+                    tcodigo=nodo_actual.valor.getCodigo()
+                    tx=nodo_actual.valor.getX()
+                    ty=nodo_actual.valor.getY()
+                    txt+='''
+                        <celdaViva>
+                            <fila>'''+str(tx)+'''</fila>
+                            <columna>'''+str(ty)+'''</columna>
+                            <codigoOrganismo>'''+tcodigo+'''</codigoOrganismo>
+                        </celdaViva>'''
+                    nodo_actual = nodo_actual.nodo_siguiente
+                txt+='''
+            </listadoCeldasVivas>
+        </muestra>
+    </listadoMuestras>
+</datosMarte>
+            '''
+                arch_xml.write(txt)
+                arch_xml.close()
+                print('*** Archivo creado exitosamente ***')
+                os.startfile("datos.xml") 
+            
+            except:print('*** Error al crear el archivo XML ***')
+
+        else:
+            print('----- No se puede escribir  el XML, No hay elementos registrados Err: escritura-----')
+
+
+
+
+    #metodo para obtener la letra asignada
     def obtenerLetra(self,codigo):
         try:
             nodo_actual = self.muestra.getListaOrganismos().cabeza
@@ -310,6 +424,7 @@ digraph structs {
         except:
             print('error al obtener la letra')
         
+    #metodo para obtener el color asignado
     def obtenerColor(self,codigo):
         try:
             nodo_actual = self.muestra.getListaOrganismos().cabeza
@@ -324,23 +439,21 @@ digraph structs {
         except:
             print('error al obtener el color')
     
+    #metodo para obtener una letra aleatoria para cada objeto de organizmos (primera idea en luga de colores)
     def obtener_letra_aleatoria(self):
     #Devuelve una letra aleatoria en mayúscula
         letra = random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
         return letra
     
+    #metodo para asignar colores
     def asignar_color(self):
         color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
         return color
     
+    #metodo solo para muestra de como recorrer la lista simple xD
     def aaa(self):
         nodo_actual = self.muestra.getListaCeldasVivas().cabeza
         while nodo_actual != None:
             tcodigo=nodo_actual.valor.getCodigo()
-            tempX=int(nodo_actual.valor.getX())
-            tempY=int(nodo_actual.valor.getY())
-            tcolor=self.obtenerColor(tcodigo)
-            if j==tempX and i==tempY:
-                txt+='''<TD bgcolor="'''+tcolor+'''"></TD>\n'''
-            else:pass
+            print(tcodigo)
             nodo_actual = nodo_actual.nodo_siguiente
